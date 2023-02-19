@@ -222,14 +222,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
-name = "client_proxy"
-version = "0.1.0"
-dependencies = [
- "async-std",
- "zbus",
-]
-
-[[package]]
 name = "concurrent-queue"
 version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -511,6 +503,14 @@ checksum = "abb12e687cfb44aa40f41fc3978ef76448f9b6038cad6aef4259d3c095a2382e"
 dependencies = [
  "cfg-if",
  "value-bag",
+]
+
+[[package]]
+name = "mdns_publisher"
+version = "0.1.0"
+dependencies = [
+ "async-std",
+ "zbus",
 ]
 
 [[package]]

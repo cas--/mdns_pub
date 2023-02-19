@@ -1,46 +1,24 @@
-use std::collections::HashMap;
 use std::error::Error;
 
-use zbus::{dbus_proxy, zvariant::Value, Connection};
+use zbus::{dbus_proxy, Connection};
 
 #[dbus_proxy(
-    interface = "org.freedesktop.Notifications",
-    default_service = "org.freedesktop.Notifications",
-    default_path = "/org/freedesktop/Notifications"
+    interface = "org.freedesktop.Avahi.Server",
+    default_service = "org.freedesktop.Avahi",
+    default_path = "/"
 )]
-trait Notifications {
+trait AvahiServer {
     // Call Notify D-Bus method
-    fn notify(
-        &self,
-        app_name: &str,
-        replaces_id: u32,
-        app_icon: &str,
-        summary: &str,
-        body: &str,
-        actions: &[&str],
-        hints: HashMap<&str, &Value<'_>>,
-        expire_timeout: i32,
-    ) -> zbus::Result<u32>;
+    fn GetHostNameFqdn(&self) -> zbus::Result<String>;
 }
 
 #[async_std::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    let connection = Connection::session().await?;
+    let connection = Connection::system().await?;
 
-    let proxy = NotificationsProxy::new(&connection).await?;
+    let avahi_server = AvahiServerProxy::new(&connection).await?;
 
-    let reply = proxy
-        .notify(
-            "my-app",
-            0,
-            "dialog-information",
-            "A summary",
-            "Some body",
-            &[],
-            HashMap::new(),
-            5000,
-        )
-        .await?;
+    let reply = avahi_server.GetHostNameFqdn().await?;
     dbg!(reply);
     Ok(())
 }
