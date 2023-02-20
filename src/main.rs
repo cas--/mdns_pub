@@ -1,6 +1,6 @@
 use std::error::Error;
 
-use zbus::{dbus_proxy, Connection};
+use zbus::Connection;
 
 mod avahi;
 
