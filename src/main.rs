@@ -27,12 +27,27 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let avahi_server = avahi::server::ServerProxy::new(&connection).await?;
 
-    let reply = avahi_server.get_host_name_fqdn().await?;
-    dbg!(reply);
+    let hostname = avahi_server.get_host_name_fqdn().await?;
+    dbg!(hostname);
 
-    let reply2 = avahi_server
-        .resolve_host_name(-1, -1, "test.local", -1, 0)
+    let cname = "test.local";
+
+    let entry_group_path = avahi_server.entry_group_new().await?;
+    dbg!("group: {}", entry_group_path.as_str());
+
+    let entry_group = avahi::entry_group::EntryGroupProxy::builder(&connection)
+        .path(&entry_group_path)?
+        .build()
         .await?;
-    dbg!(reply2);
+
+    let rdata: Vec<u8> = domain_to_rdata(cname);
+
+    entry_group
+        .add_record(-1, -1, 0, cname, 1, 5, 1, rdata)
+        .await?;
+    entry_group.commit().await?;
+
+    let test_local_hostname = avahi_server.resolve_host_name(-1, -1, cname, -1, 0).await?;
+    dbg!(test_local_hostname);
     Ok(())
 }
