@@ -12,5 +12,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let reply = avahi_server.get_host_name_fqdn().await?;
     dbg!(reply);
+
+    let reply2 = avahi_server
+        .resolve_host_name(-1, -1, "test.local", -1, 0)
+        .await?;
+    dbg!(reply2);
     Ok(())
 }
