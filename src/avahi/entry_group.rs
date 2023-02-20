@@ -19,7 +19,11 @@
 
 use zbus::dbus_proxy;
 
-#[dbus_proxy(interface = "org.freedesktop.Avahi.EntryGroup", assume_defaults = true)]
+#[dbus_proxy(
+    interface = "org.freedesktop.Avahi.EntryGroup",
+    default_service = "org.freedesktop.Avahi",
+    default_path = "/"
+)]
 trait EntryGroup {
     /// AddAddress method
     fn add_address(
@@ -41,7 +45,7 @@ trait EntryGroup {
         clazz: u16,
         type_: u16,
         ttl: u32,
-        rdata: &[u8],
+        rdata: Vec<u8>,
     ) -> zbus::Result<()>;
 
     /// AddService method
@@ -55,7 +59,7 @@ trait EntryGroup {
         domain: &str,
         host: &str,
         port: u16,
-        txt: &[&[u8]],
+        txt: Vec<Vec<u8>>,
     ) -> zbus::Result<()>;
 
     /// AddServiceSubtype method
@@ -94,7 +98,7 @@ trait EntryGroup {
         name: &str,
         type_: &str,
         domain: &str,
-        txt: &[&[u8]],
+        txt: Vec<Vec<u8>>,
     ) -> zbus::Result<()>;
 
     /// StateChanged signal
