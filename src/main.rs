@@ -1,5 +1,7 @@
 use std::error::Error;
+use std::time::Duration;
 
+use async_std::task;
 use zbus::Connection;
 
 mod avahi;
@@ -26,9 +28,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let connection = Connection::system().await?;
 
     let avahi_server = avahi::server::ServerProxy::new(&connection).await?;
+    println!("Server: {}", avahi_server.get_version_string().await?);
 
     let hostname = avahi_server.get_host_name_fqdn().await?;
-    dbg!(hostname);
+    println!("Hostname: {hostname}");
 
     let cname = "test.local";
 
@@ -47,7 +50,14 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .await?;
     entry_group.commit().await?;
 
-    let test_local_hostname = avahi_server.resolve_host_name(-1, -1, cname, -1, 0).await?;
-    dbg!(test_local_hostname);
+    loop {
+        println!("Resolving hostname {cname}...");
+        task::sleep(Duration::from_secs(3)).await;
+        let resolved_hostname = avahi_server.resolve_host_name(-1, -1, cname, -1, 0).await;
+        match resolved_hostname {
+            Ok(result) => println!("{result:?}"),
+            Err(error) => println!("Problem with resolve: {error}"),
+        };
+    }
     Ok(())
 }
